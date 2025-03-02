@@ -29,7 +29,7 @@ const CreatePost = () => {
           formData.append("img", img); // Append file directly
         }
 
-        const res = await fetch("/api/posts/create", {
+        const res = await fetch("${import.meta.env.BACKEND_URL}/api/posts/create", {
           method: "POST",
           body: formData,
         });

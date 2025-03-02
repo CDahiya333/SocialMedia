@@ -24,7 +24,7 @@ const Post = ({ post }) => {
   const { mutate: deletePost, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch(`/api/posts/${post._id}`, {
+        const res = await fetch(`${import.meta.env.BACKEND_URL}/api/posts/${post._id}`, {
           method: "DELETE",
         });
         const data = await res.json();
@@ -46,7 +46,7 @@ const Post = ({ post }) => {
   const { mutate: likePost, isPending: isLiking } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch(`/api/posts/like/${post._id}`, {
+        const res = await fetch(`${import.meta.env.BACKEND_URL}/api/posts/like/${post._id}`, {
           method: "POST",
         });
         const data = await res.json();
@@ -111,7 +111,7 @@ const Post = ({ post }) => {
         console.log("Post ID:", postId);
         console.log("Comment Text:", comment);
 
-        const res = await fetch(`/api/posts/comment/${postId}`, {
+        const res = await fetch(`${import.meta.env.BACKEND_URL}/api/posts/comment/${postId}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
