@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "https://socialmedia-backend-wu0y.onrender.com/api/:path*"
+      }
+    ]
+  }
+  
