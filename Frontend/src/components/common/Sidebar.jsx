@@ -13,7 +13,7 @@ const Sidebar = () => {
   const { mutate: logout } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch("${import.meta.env.BACKEND_URL}/api/auth/logout", {
+        const res = await fetch(`${import.meta.env.BACKEND_URL}/api/auth/logout`, {
           method: "POST",
         });
         const data = await res.json();

@@ -24,7 +24,7 @@ const port = process.env.PORT || 3000;
 
 const allowedOrigins = [
   "https://tweeterxxx.vercel.app", // Your actual Vercel domain
-  "http://localhost:5000" // For local dev
+  "http://localhost:5173" // For local dev
 ];
 // TEMPORARY CORS CONFIGURATION
 app.use(
