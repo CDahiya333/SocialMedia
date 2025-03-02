@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 //Current Working Directory; TWitterClone
-dotenv.config({ path: "Backend/.env" }); //Relative Path to Backend/.env
+dotenv.config(); 
 
 import express from "express";
 import cors from "cors";
