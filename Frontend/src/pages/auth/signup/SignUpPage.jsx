@@ -25,7 +25,12 @@ const SignUpPage = () => {
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async ({ email, username, fullname, password }) => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
+        const API_BASE_URL =
+          import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+        console.log("API_BASE_URL:", import.meta.env.VITE_BACKEND_URL);
+
+        const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -69,8 +74,7 @@ const SignUpPage = () => {
       }}
     >
       {/* Left Twitter  Logo */}
-      <div className="absolute inset-0 bg-black opacity-30">
-      </div>
+      <div className="absolute inset-0 bg-black opacity-30"></div>
       {/* Right Side Content */}
       <div className="flex-1 flex flex-col justify-center items-center z-20">
         <form

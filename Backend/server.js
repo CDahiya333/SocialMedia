@@ -26,10 +26,10 @@ const allowedOrigins = [
   "https://tweeterxxx.vercel.app", // Your actual Vercel domain
   "http://localhost:5173" // For local dev
 ];
-// TEMPORARY CORS CONFIGURATION
+
 app.use(
   cors({
-    origin: allowedOrigins, // Allows all origins temporarily
+    origin: allowedOrigins, 
     credentials: true,
     methods: "GET, POST, PUT, DELETE, OPTIONS",
     allowedHeaders: "Content-Type, Authorization",

@@ -3,19 +3,29 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const Posts = ({ feedType, username, userId }) => {
+const Posts = ({ feedType = "forYou", username, userId, activeTab }) => {
   const getPostEndpoint = () => {
-    switch (feedType) {
+    // Use activeTab if provided (for profile page), otherwise use feedType (for feed page)
+    const tabType = activeTab || feedType;
+
+    switch (tabType) {
       case "forYou":
-        return `${import.meta.env.BACKEND_URL}/api/posts/all`;
+        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`;
       case "following":
-        return `${import.meta.env.BACKEND_URL}/api/posts/following`;
+        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/following`;
       case "posts":
-        return `${import.meta.env.BACKEND_URL}/api/posts/user/${username}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/user/${username}`;
       case "likes":
-        return `${import.meta.env.BACKEND_URL}/api/posts/likes/${userId}`;
+        return `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/posts/likes/${username}`;
+      case "replies":
+        // Assuming you have an endpoint for replies
+        return `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/posts/replies/${username}`;
       default:
-        return `${import.meta.env.BACKEND_URL}/api/posts/all`;
+        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`;
     }
   };
 
@@ -26,27 +36,50 @@ const Posts = ({ feedType, username, userId }) => {
     isLoading,
     refetch,
     isRefetching,
+    error,
   } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", activeTab || feedType, username, userId],
     queryFn: async () => {
       try {
-        const res = await fetch(POST_ENDPOINT);
-        const data = await res.json();
+        const res = await fetch(POST_ENDPOINT, {
+          credentials: "include", // Ensures cookies are sent with the request
+        });
 
         if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
+          const data = await res.json();
+          throw new Error(data.error || `Failed to fetch posts: ${res.status}`);
         }
 
+        const data = await res.json();
         return data;
       } catch (error) {
-        throw new Error(error);
+        console.error("Error fetching posts:", error);
+        throw error;
       }
     },
+    enabled: Boolean(
+      username || feedType === "forYou" || feedType === "following"
+    ),
   });
 
   useEffect(() => {
     refetch();
-  }, [feedType, refetch, username]);
+  }, [feedType, activeTab, username, userId, refetch]);
+
+  if (error) {
+    return (
+      <div className="text-center p-4">
+        <p className="text-red-500">Error loading posts</p>
+        <p className="text-sm text-gray-400">{error.message}</p>
+        <button
+          onClick={() => refetch()}
+          className="mt-2 btn btn-sm btn-outline"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -57,10 +90,10 @@ const Posts = ({ feedType, username, userId }) => {
           <PostSkeleton />
         </div>
       )}
-      {!isLoading && !isRefetching && posts?.length === 0 && (
-        <p className="text-center my-4">So Empty</p>
+      {!isLoading && !isRefetching && (!posts || posts.length === 0) && (
+        <p className="text-center my-4">No posts to show</p>
       )}
-      {!isLoading && !isRefetching && posts && (
+      {!isLoading && !isRefetching && posts && posts.length > 0 && (
         <div>
           {posts.map((post) => (
             <Post key={post._id} post={post} />
@@ -70,4 +103,5 @@ const Posts = ({ feedType, username, userId }) => {
     </>
   );
 };
+
 export default Posts;

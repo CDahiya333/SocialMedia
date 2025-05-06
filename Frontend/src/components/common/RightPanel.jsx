@@ -1,20 +1,31 @@
-import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-
+import { Link } from "react-router-dom";
+import LoadingSpinner from "./LoadingSpinner";
+import useAuth from "../../hooks/useAuth";
 import useFollow from "../../hooks/useFollow";
 
-import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
-import LoadingSpinner from "./LoadingSpinner";
-
 const RightPanel = () => {
-  const { data: suggestedUsers, isLoading } = useQuery({
+  const { data: authUser } = useAuth();
+  const { follow, isPending: isFollowingUser } = useFollow();
+
+  const {
+    data: suggestedUsers,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["suggestedUsers"],
     queryFn: async () => {
       try {
-        const res = await fetch(`${import.meta.env.BACKEND_URL}/api/users/suggested`);
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/suggested`,
+          {
+            credentials: "include",
+          }
+        );
         const data = await res.json();
         if (!res.ok) {
-          throw new Error(data.error || "Something went wrong!");
+          throw new Error(data.error || "Something went wrong");
         }
         return data;
       } catch (error) {
@@ -23,62 +34,52 @@ const RightPanel = () => {
     },
   });
 
-  const { follow, isPending } = useFollow();
-
-  if (suggestedUsers?.length === 0) return <div className="md:w-64 w-0"></div>;
+  if (!authUser) return null;
 
   return (
-    <div className=" hidden lg:block my-4 mx-2 ">
-      <div className="bg-white p-4 rounded-md sticky top-2 dark:bg-black">
-        <p className="font-bold text-black dark:text-white">Suggested Users</p>
-        <div className="flex flex-col gap-4">
-          {/* item */}
+    <div className="hidden lg:flex flex-col basis-1/3 p-4 sticky top-0 h-screen overflow-auto">
+      <div className="bg-zinc">
+        <div className="rounded-xl bg-zinc-800 p-4">
+          <h2 className="font-bold text-xl mb-5">Who to follow</h2>
           {isLoading && (
-            <>
-              <RightPanelSkeleton />
-              <RightPanelSkeleton />
-              <RightPanelSkeleton />
-              <RightPanelSkeleton />
-            </>
+            <div className="flex justify-center">
+              <LoadingSpinner />
+            </div>
           )}
-          {!isLoading &&
-            suggestedUsers?.map((user) => (
-              <Link
-                to={`/profile/${user.username}`}
-                className="flex items-center justify-between gap-4"
-                key={user._id}
-              >
-                <div className="flex gap-2 items-center">
+          {isError && <p className="text-red-500">{error.message}</p>}
+          <div className="flex flex-col gap-4">
+            {suggestedUsers?.map((user) => (
+              <div className="flex justify-between" key={user._id}>
+                <Link to={`/profile/${user.username}`} className="flex gap-2">
                   <div className="avatar">
-                    <div className="w-8 rounded-full">
-                      <img src={user.profileImg || "/avatar-placeholder.png"} />
+                    <div className="w-12 rounded-full">
+                      <img
+                        src={user.profileImg || "/avatar-placeholder.png"}
+                        alt={`${user.username}'s avatar`}
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-semibold tracking-tight truncate w-28 dark:text-white ">
+                    <span className="font-bold text-white">
                       {user.fullname}
                     </span>
-                    <span className="text-sm text-slate-500">
-                      @{user.username}
-                    </span>
+                    <span className="text-gray-400">@{user.username}</span>
                   </div>
-                </div>
-                <div>
-                  <button
-                    className="btn bg-white text-black  hover:bg-white hover:opacity-90 rounded-full btn-sm "
-                    onClick={(e) => {
-                      e.preventDefault();
-                      follow(user._id);
-                    }}
-                  >
-                    {isPending ? <LoadingSpinner size="sm" /> : "Follow"}
-                  </button>
-                </div>
-              </Link>
+                </Link>
+                <button
+                  onClick={() => follow(user._id)}
+                  className="btn btn-primary btn-sm rounded-full h-8 text-white self-center"
+                  disabled={isFollowingUser}
+                >
+                  {isFollowingUser ? "Following..." : "Follow"}
+                </button>
+              </div>
             ))}
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default RightPanel;
