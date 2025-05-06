@@ -44,7 +44,7 @@ function App() {
   }
 
   return (
-    <div className="flex  mx-auto">
+    <div className="flex  mx-auto bg-zinc-900">
       {/* Common component, bc it's not wrapped with Routes */}
       {authUser && <Sidebar />}
       <Routes>
