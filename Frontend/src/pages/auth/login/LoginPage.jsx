@@ -25,7 +25,7 @@ const LoginPage = () => {
     mutationFn: async ({ username, password }) => {
       try {
         const res = await fetch(
-          `${import.meta.env.BACKEND_URL}/api/auth/login`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
           {
             method: "POST",
             headers: {
@@ -70,7 +70,7 @@ const LoginPage = () => {
       }}
     >
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="absolute inset-0 bg-black opacity-40"></div>
 
       {/* Center Content */}
       <div className="flex flex-1 flex-col justify-center items-center px-4 z-20">

@@ -25,7 +25,7 @@ const SignUpPage = () => {
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async ({ email, username, fullname, password }) => {
       try {
-        const res = await fetch(`${import.meta.env.BACKEND_URL}/api/auth/signup`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -59,18 +59,25 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto flex h-screen px-10">
+    <div
+      className="flex relative h-screen w-full flex-col"
+      style={{
+        backgroundImage: "url('/SignUpPanel.png')",
+        backgroundPosition: "100% 50%",
+        backgroundSize: "cover",
+        opacity: "0.8",
+      }}
+    >
       {/* Left Twitter  Logo */}
-      <div className="flex-1 hidden lg:flex items-center  justify-center">
-        <XSvg className="lg:w-2/3 fill-white" />
+      <div className="absolute inset-0 bg-black opacity-30">
       </div>
       {/* Right Side Content */}
-      <div className="flex-1 flex flex-col justify-center items-center">
+      <div className="flex-1 flex flex-col justify-center items-center z-20">
         <form
-          className="lg:w-2/3  mx-auto md:mx-20 flex gap-4 flex-col"
+          className="  mx-auto md:mx-20 flex gap-4 flex-col"
           onSubmit={handleSubmit}
         >
-          <XSvg className="w-24 lg:hidden fill-white" />
+          <XSvg className="w-24  fill-white" />
           {/* Form Heading */}
           <h1 className="text-4xl font-extrabold text-white">Join today.</h1>
           {/* Form-Containers */}
