@@ -9,6 +9,7 @@ import {
   getLikedPosts,
   getFollowingPosts,
   getUserPosts,
+  getUserReplies,
 } from "../controllers/postController.js";
 import multer from "multer";
 
@@ -22,7 +23,8 @@ router.post("/create", protectRoute, upload.single("img"), createPost);
 
 router.get("/all", protectRoute, getAllPosts);
 router.get("/following", protectRoute, getFollowingPosts);
-router.get("/likes/:id", protectRoute, getLikedPosts);
+router.get("/likes/user/:username", protectRoute, getLikedPosts);
+router.get("/replies/user/:username", protectRoute, getUserReplies);
 router.get("/user/:username", protectRoute, getUserPosts);
 router.post("/like/:id", protectRoute, likeUnlikePost);
 router.post("/comment/:id", protectRoute, commentOnPost);

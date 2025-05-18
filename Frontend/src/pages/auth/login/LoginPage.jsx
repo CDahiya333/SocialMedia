@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import XSvg from "../../../components/svgs/X";
 
@@ -8,6 +8,7 @@ import { MdPassword } from "react-icons/md";
 import toast from "react-hot-toast";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from '../../../utils/axiosConfig';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const LoginPage = () => {
     password: "",
   });
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const {
     mutate: loginMutation,
@@ -24,40 +26,34 @@ const LoginPage = () => {
   } = useMutation({
     mutationFn: async ({ username, password }) => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ username, password }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to Login");
-        }
+        const { data } = await api.post('/api/auth/login', { username, password });
+        return data;
       } catch (error) {
-        throw new Error(error);
+        throw new Error(error.response?.data?.error || "Failed to Login");
       }
     },
-    onSuccess: () => {
-      toast.success("Login Successful");
+    onSuccess: (data) => {
+      queryClient.setQueryData(["authUser"], data);
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
+      toast.success("Login Successful");
+      setTimeout(() => {
+        navigate('/');
+      }, 100);
     },
+    onError: (error) => {
+      toast.error(error.message || "Failed to login");
+    }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     loginMutation(formData);
-    // console.log(formData);
   };
-  // const isError = false;
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   return (
     <div
       className="flex relative h-screen w-full flex-row opacity-10 "

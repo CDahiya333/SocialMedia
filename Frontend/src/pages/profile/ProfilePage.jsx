@@ -7,7 +7,7 @@ import useFollow from "../../hooks/useFollow";
 import useAuth from "../../hooks/useAuth";
 import Posts from "../../components/common/Posts";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-import UpdateProfileModal from "./EditProfileModal";
+import EditProfileModal from "./EditProfileModal";
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -153,38 +153,38 @@ const ProfilePage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex w-full border-b border-gray-700 bg-black">
+        <div className="flex w-full border-b border-border-light dark:border-border-dark theme-panel">
           <div
-            className={`flex justify-center flex-1 cursor-pointer p-3 hover:bg-secondary transition duration-300 relative ${
-              activeTab === "posts" ? "font-bold" : ""
+            className={`flex justify-center flex-1 cursor-pointer p-3 theme-hover transition duration-300 relative ${
+              activeTab === "posts" ? "font-bold theme-text-primary" : "theme-text-secondary"
             }`}
             onClick={() => setActiveTab("posts")}
           >
             Posts
             {activeTab === "posts" && (
-              <div className="absolute bottom-0 w-12 h-1 rounded-full bg-primary"></div>
+              <div className="absolute bottom-0 w-12 h-1 rounded-full bg-primary-light dark:bg-primary-dark"></div>
             )}
           </div>
           <div
-            className={`flex justify-center flex-1 cursor-pointer p-3 hover:bg-secondary transition duration-300 relative ${
-              activeTab === "replies" ? "font-bold" : ""
+            className={`flex justify-center flex-1 cursor-pointer p-3 theme-hover transition duration-300 relative ${
+              activeTab === "replies" ? "font-bold theme-text-primary" : "theme-text-secondary"
             }`}
             onClick={() => setActiveTab("replies")}
           >
             Replies
             {activeTab === "replies" && (
-              <div className="absolute bottom-0 w-12 h-1 rounded-full bg-primary"></div>
+              <div className="absolute bottom-0 w-12 h-1 rounded-full bg-primary-light dark:bg-primary-dark"></div>
             )}
           </div>
           <div
-            className={`flex justify-center flex-1 cursor-pointer p-3 hover:bg-secondary transition duration-300 relative ${
-              activeTab === "likes" ? "font-bold" : ""
+            className={`flex justify-center flex-1 cursor-pointer p-3 theme-hover transition duration-300 relative ${
+              activeTab === "likes" ? "font-bold theme-text-primary" : "theme-text-secondary"
             }`}
             onClick={() => setActiveTab("likes")}
           >
             Likes
             {activeTab === "likes" && (
-              <div className="absolute bottom-0 w-12 h-1 rounded-full bg-primary"></div>
+              <div className="absolute bottom-0 w-12 h-1 rounded-full bg-primary-light dark:bg-primary-dark"></div>
             )}
           </div>
         </div>
@@ -194,7 +194,8 @@ const ProfilePage = () => {
       </div>
 
       {isUpdateProfileModalOpen && (
-        <UpdateProfileModal
+        <EditProfileModal
+          authUser={authUser}
           isOpen={isUpdateProfileModalOpen}
           onClose={() => setIsUpdateProfileModalOpen(false)}
         />

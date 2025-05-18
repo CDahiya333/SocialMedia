@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner";
 import useAuth from "../../hooks/useAuth";
 import useFollow from "../../hooks/useFollow";
+import TrendingTopics from "./TrendingTopics";
 
 const RightPanel = () => {
   const { data: authUser } = useAuth();
@@ -37,10 +38,10 @@ const RightPanel = () => {
   if (!authUser) return null;
 
   return (
-    <div className="hidden lg:flex flex-col basis-1/3 p-4 sticky top-0 h-screen overflow-auto">
-      <div className="bg-zinc">
-        <div className="rounded-xl bg-zinc-800 p-4">
-          <h2 className="font-bold text-xl mb-5">Who to follow</h2>
+    <div className="hidden lg:flex flex-col basis-1/3 p-4 sticky top-0 h-screen overflow-auto theme-panel">
+      <div className="flex flex-col gap-4">
+        <div className="theme-card p-4">
+          <h2 className="font-bold text-xl mb-5 theme-text-primary">Who to follow</h2>
           {isLoading && (
             <div className="flex justify-center">
               <LoadingSpinner />
@@ -60,15 +61,15 @@ const RightPanel = () => {
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-bold text-white">
+                    <span className="font-bold theme-text-primary">
                       {user.fullname}
                     </span>
-                    <span className="text-gray-400">@{user.username}</span>
+                    <span className="theme-text-secondary">@{user.username}</span>
                   </div>
                 </Link>
                 <button
                   onClick={() => follow(user._id)}
-                  className="btn btn-primary btn-sm rounded-full h-8 text-white self-center"
+                  className="theme-button-primary px-4 py-1 rounded-full text-sm"
                   disabled={isFollowingUser}
                 >
                   {isFollowingUser ? "Following..." : "Follow"}
@@ -77,6 +78,8 @@ const RightPanel = () => {
             ))}
           </div>
         </div>
+        
+        <TrendingTopics />
       </div>
     </div>
   );

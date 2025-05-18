@@ -13,17 +13,17 @@ import RightPanel from "./components/common/RightPanel";
 import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/LoadingSpinner";
+import { useTheme } from "./context/ThemeContext";
 
 function App() {
+  const { isDark } = useTheme();
   const { data: authUser, isLoading } = useQuery({
-    // we use queryKey to give a unique name to our query and refer to it later
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
-          { credentials: "include" }
-        );
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
+          credentials: "include",
+        });
         const data = await res.json();
         if (data.error) return null;
         if (!res.ok) {
@@ -32,7 +32,8 @@ function App() {
         console.log("authUser is here:", data);
         return data;
       } catch (error) {
-        throw new Error(error);
+        console.log("error is here:", error);
+        return null;
       }
     },
     retry: false,
@@ -40,40 +41,45 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex justify-center items-center">
+      <div className="h-screen flex justify-center items-center theme-main">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="flex  mx-auto bg-zinc-900">
-      {/* Common component, bc it's not wrapped with Routes */}
-      {authUser && <Sidebar />}
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/login"
-          element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/notifications"
-          element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/profile/:username"
-          element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-        />
-      </Routes>
-      {authUser && <RightPanel />}
-      <Toaster />
+    <div className={isDark ? 'dark' : ''}>
+      <div className="theme-main min-h-screen">
+        <div className="flex max-w-6xl mx-auto">
+          {authUser && <Sidebar />}
+          <main className="flex-grow theme-panel">
+            <Routes>
+              <Route
+                path="/"
+                element={authUser ? <HomePage /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/login"
+                element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/signup"
+                element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/notifications"
+                element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/profile/:username"
+                element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+              />
+            </Routes>
+          </main>
+          {authUser && <RightPanel />}
+          <Toaster />
+        </div>
+      </div>
     </div>
   );
 }

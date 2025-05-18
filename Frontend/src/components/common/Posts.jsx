@@ -3,7 +3,7 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const Posts = ({ feedType = "forYou", username, userId, activeTab }) => {
+const Posts = ({ feedType = "forYou", username, activeTab }) => {
   const getPostEndpoint = () => {
     // Use activeTab if provided (for profile page), otherwise use feedType (for feed page)
     const tabType = activeTab || feedType;
@@ -16,14 +16,9 @@ const Posts = ({ feedType = "forYou", username, userId, activeTab }) => {
       case "posts":
         return `${import.meta.env.VITE_BACKEND_URL}/api/posts/user/${username}`;
       case "likes":
-        return `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/posts/likes/${username}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/likes/user/${username}`;
       case "replies":
-        // Assuming you have an endpoint for replies
-        return `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/posts/replies/${username}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/replies/user/${username}`;
       default:
         return `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`;
     }
@@ -38,7 +33,7 @@ const Posts = ({ feedType = "forYou", username, userId, activeTab }) => {
     isRefetching,
     error,
   } = useQuery({
-    queryKey: ["posts", activeTab || feedType, username, userId],
+    queryKey: ["posts", activeTab || feedType, username],
     queryFn: async () => {
       try {
         const res = await fetch(POST_ENDPOINT, {
@@ -64,7 +59,7 @@ const Posts = ({ feedType = "forYou", username, userId, activeTab }) => {
 
   useEffect(() => {
     refetch();
-  }, [feedType, activeTab, username, userId, refetch]);
+  }, [feedType, activeTab, username, refetch]);
 
   if (error) {
     return (

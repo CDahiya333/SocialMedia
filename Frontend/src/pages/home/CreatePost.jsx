@@ -1,16 +1,33 @@
 import { CiImageOn } from "react-icons/ci";
 import { BsEmojiSmileFill } from "react-icons/bs";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
+import EmojiPicker from "emoji-picker-react";
+import { useTheme } from "../../context/ThemeContext";
 
 const CreatePost = () => {
   const [text, setText] = useState("");
   const [img, setImg] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const imgRef = useRef(null);
+  const emojiPickerRef = useRef(null);
+  const { isDark } = useTheme();
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const { data: authUser } = useAuth();
   const queryClient = useQueryClient();
@@ -60,31 +77,30 @@ const CreatePost = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log("Submitting Post:");
-    console.log("Text:", text);
-    console.log("Image:", img);
-
     createPost({ text, img });
   };
 
   const handleImgChange = (e) => {
     const file = e.target.files[0];
-
     if (file) {
-      console.log("Selected file:", file);
       setImg(file);
       const previewUrl = URL.createObjectURL(file);
-      console.log("Generated preview URL:", previewUrl);
       setPreview(previewUrl);
     }
+  };
+
+  const onEmojiClick = (emojiObject) => {
+    const cursor = document.querySelector('textarea').selectionStart;
+    const textBeforeCursor = text.slice(0, cursor);
+    const textAfterCursor = text.slice(cursor);
+    setText(textBeforeCursor + emojiObject.emoji + textAfterCursor);
+    setShowEmojiPicker(false);
   };
 
   if (!authUser) return null;
 
   return (
-    // Post Skeleton: Avatar -- Placeholder
-    <div className="flex p-4 items-start gap-4 border-b border-gray-700">
+    <div className="flex p-4 items-start gap-4 border-b border-border-light dark:border-border-dark">
       <div className="avatar">
         <div className="w-8 rounded-full">
           <img
@@ -93,18 +109,17 @@ const CreatePost = () => {
           />
         </div>
       </div>
-      <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-2 w-full relative" onSubmit={handleSubmit}>
         <textarea
-          className="textarea w-full p-0 text-lg resize-none border-none focus:outline-none border-gray-800"
+          className="w-full p-0 text-lg resize-none bg-transparent theme-text-primary placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark focus:outline-none"
           placeholder="What is happening?!"
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        {/* Image Preview */}
         {preview && (
           <div className="relative w-72 mx-auto">
             <IoCloseSharp
-              className="absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer"
+              className="absolute top-0 right-0 text-white bg-black/50 dark:bg-white/20 rounded-full w-5 h-5 cursor-pointer"
               onClick={() => {
                 setImg(null);
                 setPreview(null);
@@ -118,17 +133,34 @@ const CreatePost = () => {
             />
           </div>
         )}
-        {/* Reference to File Upload */}
-        <div className="flex justify-between border-t py-1 border-t-gray-700">
-          {/* Gallery & Emoji Icon */}
-          <div className="flex gap-2 items-center">
+        <div className="flex justify-between border-t py-1 border-border-light dark:border-border-dark">
+          <div className="flex gap-2 items-center relative">
             <CiImageOn
-              className="fill-primary w-6 h-6 cursor-pointer"
+              className="text-primary-light dark:text-primary-dark w-6 h-6 cursor-pointer"
               onClick={() => imgRef.current.click()}
             />
-            <BsEmojiSmileFill className="fill-primary w-5 h-5 cursor-pointer" />
+            <div className="relative" ref={emojiPickerRef}>
+              <BsEmojiSmileFill 
+                className="text-primary-light dark:text-primary-dark w-5 h-5 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
+              />
+              {showEmojiPicker && (
+                <div className="absolute top-8 left-0 z-50 shadow-lg rounded-xl overflow-hidden bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
+                  <EmojiPicker
+                    theme={isDark ? 'dark' : 'light'}
+                    onEmojiClick={onEmojiClick}
+                    width={300}
+                    height={400}
+                    searchDisabled
+                    skinTonesDisabled
+                    previewConfig={{
+                      showPreview: false
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-          {/* File Upload Box */}
           <input
             type="file"
             accept="image/*"
@@ -136,7 +168,7 @@ const CreatePost = () => {
             ref={imgRef}
             onChange={handleImgChange}
           />
-          <button className="btn btn-primary rounded-full btn-sm text-white px-4">
+          <button className="theme-button-primary px-4 py-1 rounded-full text-sm">
             {isPending ? "Posting..." : "Post"}
           </button>
         </div>
@@ -145,4 +177,5 @@ const CreatePost = () => {
     </div>
   );
 };
+
 export default CreatePost;

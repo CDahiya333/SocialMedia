@@ -184,10 +184,10 @@ const NotificationPage = () => {
       )}
 
       {isDeleting && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-gray-800 p-4 rounded shadow-lg flex flex-col items-center">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="theme-card p-4 flex flex-col items-center">
             <LoadingSpinner size="md" />
-            <p className="mt-2">Deleting notifications...</p>
+            <p className="mt-2 theme-text-primary">Deleting notifications...</p>
           </div>
         </div>
       )}

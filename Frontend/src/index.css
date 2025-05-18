@@ -1,10 +1,76 @@
-@import "tailwindcss";
-@plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Light theme variables */
+  --color-primary: #1DA1F2;
+  --color-background: #FFFFFF;
+  --color-surface: #F7F9FA;
+  --color-text: #14171A;
+  --color-text-secondary: #657786;
+  --color-border: #E1E8ED;
 }
 
-/* Comment add */
-.heading-font{
-  font:Instrument serif;
-  font-size: large;
+/* Dark theme variables */
+:root.dark {
+  --color-primary: #1A91DA;
+  --color-background: #15202B;
+  --color-surface: #1E2732;
+  --color-text: #FFFFFF;
+  --color-text-secondary: #8899A6;
+  --color-border: #38444D;
+}
+
+/* Add smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease-in-out,
+              border-color 0.3s ease-in-out,
+              color 0.3s ease-in-out,
+              box-shadow 0.3s ease-in-out;
+}
+
+/* Utility classes for common theme-aware styles */
+@layer utilities {
+  /* Main layout sections */
+  .theme-main {
+    @apply bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark;
+  }
+
+  .theme-sidebar {
+    @apply bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark;
+  }
+
+  .theme-panel {
+    @apply bg-surface-light dark:bg-surface-dark;
+  }
+
+  .theme-card {
+    @apply bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl;
+  }
+
+  /* Text styles */
+  .theme-text-primary {
+    @apply text-text-light dark:text-text-dark;
+  }
+
+  .theme-text-secondary {
+    @apply text-text-secondary-light dark:text-text-secondary-dark;
+  }
+
+  /* Interactive elements */
+  .theme-hover {
+    @apply hover:bg-surface-light/80 dark:hover:bg-surface-dark/80;
+  }
+
+  .theme-button-primary {
+    @apply bg-primary-light dark:bg-primary-dark text-white hover:opacity-90;
+  }
+
+  .theme-button-secondary {
+    @apply border border-border-light dark:border-border-dark hover:bg-surface-light dark:hover:bg-surface-dark;
+  }
 }

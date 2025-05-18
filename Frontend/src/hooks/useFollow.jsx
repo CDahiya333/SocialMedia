@@ -6,16 +6,17 @@ const useFollow = () => {
   const {
     mutate: follow,
     isPending,
-    error,
   } = useMutation({
     mutationFn: async (userId) => {
       try {
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/follow/${userId}`, {
           method: "POST",
+          credentials: "include",
         });
 
         if (!res.ok) {
-          throw new Error("Failed to follow user");
+          const data = await res.json();
+          throw new Error(data.error || "Failed to follow user");
         }
 
         return await res.json();
@@ -24,13 +25,15 @@ const useFollow = () => {
       }
     },
     onSuccess: () => {
+      toast.success("User followed successfully");
       Promise.all([
         queryClient.invalidateQueries({ queryKey: ["suggestedUsers"] }),
         queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+        queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
       ]);
     },
-    onError: () => {
-      toast.error(error.message);
+    onError: (error) => {
+      toast.error(error.message || "Failed to follow user");
     },
   });
   return { follow, isPending };

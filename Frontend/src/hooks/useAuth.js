@@ -1,27 +1,28 @@
 // src/hooks/useAuth.js
 import { useQuery } from "@tanstack/react-query";
+import api from '../utils/axiosConfig';
+
 const useAuth = () => {
   return useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
-          { credentials: "include" }
-        );
-        const data = await res.json();
-        if (data.error) return null;
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
-        }
+        const { data } = await api.get('/api/auth/me');
+        if (!data) return null;
         return data;
       } catch (error) {
-        console.log("error in useAuth:", error);
-        return null; // Return null on error to indicate not authenticated
+        // If it's a 401 error, let the interceptor handle it
+        if (error.response?.status === 401) {
+          return null;
+        }
+        console.error("Error in useAuth:", error);
+        return null;
       }
     },
     retry: false,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnMount: true, // Refetch when component mounts
   });
 };
 

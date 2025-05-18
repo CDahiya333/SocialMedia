@@ -160,16 +160,18 @@ export const getAllPosts = async (req, res) => {
   }
 };
 export const getLikedPosts = async (req, res) => {
-  const userId = req.params.id;
   try {
-    const user = await User.findById(userId);
+    const { username } = req.params;
+    
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: "User Not Found" });
     }
-    const likedPosts = await Post.find({ _id: { $in: user.likedPosts || [] } })
+
+    const likedPosts = await Post.find({ likes: user._id })
+      .sort({ createdAt: -1 })
       .populate({ path: "user", select: "-password" })
-      .populate({ path: "comments.user", select: "-password" })
-      .lean(); // Optimize query performance
+      .populate({ path: "comments.user", select: "-password" });
 
     res.status(200).json(likedPosts);
   } catch (error) {
@@ -214,6 +216,29 @@ export const getUserPosts = async (req, res) => {
     res.status(200).json(posts);
   } catch (error) {
     console.log("Error in getUserPosts Controller:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const getUserReplies = async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: "User Not Found" });
+    }
+
+    // Find all posts where the user has commented
+    const postsWithReplies = await Post.find({
+      "comments.user": user._id
+    })
+    .sort({ createdAt: -1 })
+    .populate({ path: "user", select: "-password" })
+    .populate({ path: "comments.user", select: "-password" });
+
+    res.status(200).json(postsWithReplies);
+  } catch (error) {
+    console.log("Error in getUserReplies Controller:", error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
